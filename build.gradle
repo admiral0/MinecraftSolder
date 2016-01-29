@@ -18,8 +18,8 @@ buildscript {
 apply plugin: 'forge'
 
 version = "1.0"
-group= "com.yourname.modid" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "modid"
+group= "it.admiral0.minecraftsolder" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "minecraftsolder"
 
 minecraft {
     version = "1.7.10-10.13.4.1614-1.7.10"
@@ -31,7 +31,12 @@ dependencies {
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"
     //compile "some.group:artifact:version"
-      
+
+
+    compile 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:2.22.1'
+    compile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.22.1'
+
+
     // real examples
     //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
     //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env

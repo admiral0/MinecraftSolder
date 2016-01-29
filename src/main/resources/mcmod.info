@@ -1,14 +1,14 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
+  "modid": "minecraftsolder",
+  "name": "Minecraft Solder",
+  "description": "Implementation of solder API as a Mod",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authorList": ["admiral0", "19daniel82"],
+  "credits": "",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
