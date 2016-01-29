@@ -23,10 +23,12 @@ public class MinecraftSolder
     public static final String VERSION = "1.0";
 
     private static final String CAT_WEBSERVER = "WebServer";
+    private static final String CAT_TECHNIC = "Technic";
 
     public static Logger logger;
 
     private int port;
+    private String apiKey;
 
 
     @EventHandler
@@ -42,7 +44,9 @@ public class MinecraftSolder
                 + "to serve the api. It is mapped to /";
         port = portProperty.getInt();
 
-
+        Property apiKeyProperty = config.get(CAT_TECHNIC, "apiKey", "INVALID_KEY");
+        apiKeyProperty.comment = "The apiKey on Technic Platform";
+        apiKey = apiKeyProperty.getString();
 
         config.save();
     }
@@ -51,10 +55,14 @@ public class MinecraftSolder
     public void init(FMLInitializationEvent event) throws Exception
     {
         if(event.getSide().isServer()) {
+
             logger.info("Loading mod MinecraftSolder");
             URI baseUri = UriBuilder.fromUri("http://localhost/").port(port).build();
-            ResourceConfig config = new ResourceConfig().packages("it.admiral0");
-            config.register(JacksonFeature.class);
+            MinecraftConfig mconf = new MinecraftConfig(baseUri,apiKey, port);
+            ResourceConfig config = new ResourceConfig()
+                    .packages("it.admiral0")
+                    .register(JacksonFeature.class)
+                    .registerInstances(mconf);
             HttpServer server = GrizzlyHttpServerFactory.createHttpServer(baseUri, config);
             server.start();
             logger.info("Server running on " + baseUri.toString());
