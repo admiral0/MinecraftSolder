@@ -32,7 +32,7 @@ public class MinecraftSolder
 
         Property portProperty = config.get(CAT_WEBSERVER, "port", 8000);
         portProperty.comment = "The port the webserver runs on.\n"
-                + "You should set this on a nonstandard port and use a proxy"
+                + "You should set this on a nonstandard port and use a proxy "
                 + "to serve the api. It is mapped to /";
         port = portProperty.getInt();
 
