@@ -1,5 +1,5 @@
 .gradle/
-root/
+eclipse/
 *.iml
 .idea/
 build/
