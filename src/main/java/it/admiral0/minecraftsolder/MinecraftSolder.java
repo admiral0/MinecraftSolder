@@ -9,6 +9,7 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import org.apache.logging.log4j.Logger;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -58,11 +59,16 @@ public class MinecraftSolder
 
             logger.info("Loading mod MinecraftSolder");
             URI baseUri = UriBuilder.fromUri("http://localhost/").port(port).build();
-            MinecraftConfig mconf = new MinecraftConfig(baseUri,apiKey, port);
+            final MinecraftConfig mconf = new MinecraftConfig(baseUri,apiKey, port);
             ResourceConfig config = new ResourceConfig()
                     .packages("it.admiral0")
                     .register(JacksonFeature.class)
-                    .registerInstances(mconf);
+                    .register(new AbstractBinder() {
+                        @Override
+                        protected void configure() {
+                            bind(mconf);
+                        }
+                    });
             HttpServer server = GrizzlyHttpServerFactory.createHttpServer(baseUri, config);
             server.start();
             logger.info("Server running on " + baseUri.toString());
