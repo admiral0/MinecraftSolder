@@ -10,6 +10,7 @@ import net.minecraftforge.common.config.Property;
 import org.apache.logging.log4j.Logger;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.ws.rs.core.UriBuilder;
@@ -41,6 +42,8 @@ public class MinecraftSolder
                 + "to serve the api. It is mapped to /";
         port = portProperty.getInt();
 
+
+
         config.save();
     }
 
@@ -51,6 +54,7 @@ public class MinecraftSolder
             logger.info("Loading mod MinecraftSolder");
             URI baseUri = UriBuilder.fromUri("http://localhost/").port(port).build();
             ResourceConfig config = new ResourceConfig().packages("it.admiral0");
+            config.register(JacksonFeature.class);
             HttpServer server = GrizzlyHttpServerFactory.createHttpServer(baseUri, config);
             server.start();
             logger.info("Server running on " + baseUri.toString());
