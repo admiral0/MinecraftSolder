@@ -15,7 +15,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
-@Mod(modid = MinecraftSolder.MODID, version = MinecraftSolder.VERSION)
+@Mod(modid = MinecraftSolder.MODID, version = MinecraftSolder.VERSION, acceptableRemoteVersions = "*")
 public class MinecraftSolder
 {
     public static final String MODID = "minecraftsolder";
