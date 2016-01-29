@@ -7,6 +7,7 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import org.apache.logging.log4j.Logger;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -22,11 +23,15 @@ public class MinecraftSolder
 
     private static final String CAT_WEBSERVER = "WebServer";
 
+    public static Logger logger;
+
     private int port;
 
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event){
+        logger = event.getModLog();
+
         Configuration config = new Configuration(event.getSuggestedConfigurationFile());
         config.load();
 
@@ -42,9 +47,15 @@ public class MinecraftSolder
     @EventHandler
     public void init(FMLInitializationEvent event) throws Exception
     {
-        URI baseUri = UriBuilder.fromUri("http://localhost/").port(port).build();
-        ResourceConfig config = new ResourceConfig().packages("it.admiral0");
-        HttpServer server = GrizzlyHttpServerFactory.createHttpServer(baseUri, config);
-        server.start();
+        if(event.getSide().isServer()) {
+            logger.info("Loading mod MinecraftSolder");
+            URI baseUri = UriBuilder.fromUri("http://localhost/").port(port).build();
+            ResourceConfig config = new ResourceConfig().packages("it.admiral0");
+            HttpServer server = GrizzlyHttpServerFactory.createHttpServer(baseUri, config);
+            server.start();
+            logger.info("Server running on " + baseUri.toString());
+        }else{
+            logger.info("Will not load if not on the client.");
+        }
     }
 }
