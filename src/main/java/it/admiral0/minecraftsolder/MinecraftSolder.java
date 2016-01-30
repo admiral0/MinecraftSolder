@@ -1,5 +1,7 @@
 package it.admiral0.minecraftsolder;
 
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModAPIManager;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import net.minecraft.init.Blocks;
 import cpw.mods.fml.common.Mod;
@@ -67,6 +69,7 @@ public class MinecraftSolder
                         @Override
                         protected void configure() {
                             bind(mconf);
+                            bind(Loader.instance());
                         }
                     });
             HttpServer server = GrizzlyHttpServerFactory.createHttpServer(baseUri, config);
