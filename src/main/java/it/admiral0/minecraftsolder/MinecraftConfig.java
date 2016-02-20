@@ -9,12 +9,9 @@ public class MinecraftConfig {
     private URI baseUri;
     private int port;
     private String apiKey;
-
-    public MinecraftConfig(URI baseUri, String apiKey, int port) {
-        this.baseUri = baseUri;
-        this.apiKey = apiKey;
-        this.port = port;
-    }
+    private String modpackName;
+    private String modpackVersion;
+    private String mirrorUrl;
 
     public URI getBaseUri() {
         return baseUri;
@@ -38,5 +35,29 @@ public class MinecraftConfig {
 
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
+    }
+
+    public String getModpackName() {
+        return modpackName;
+    }
+
+    public void setModpackName(String modpackName) {
+        this.modpackName = modpackName;
+    }
+
+    public String getModpackVersion() {
+        return modpackVersion;
+    }
+
+    public void setModpackVersion(String modpackVersion) {
+        this.modpackVersion = modpackVersion;
+    }
+
+    public String getMirrorUrl() {
+        return mirrorUrl;
+    }
+
+    public void setMirrorUrl(String mirrorUrl) {
+        this.mirrorUrl = mirrorUrl;
     }
 }

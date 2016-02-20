@@ -2,9 +2,12 @@ package it.admiral0.minecraftsolder.api.mod;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.google.common.collect.Lists;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.ModMetadata;
+import it.admiral0.minecraftsolder.MinecraftSolder;
+import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -12,6 +15,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Created by admiral0 on 30/01/16.
@@ -19,6 +24,7 @@ import java.io.StringWriter;
 @Path("/mod")
 public class ModInfo {
     @Inject private Loader loader;
+    private Logger logger = MinecraftSolder.logger;
 
     @GET @Produces("application/json")
     public String getNoMod() throws Exception{
@@ -27,11 +33,12 @@ public class ModInfo {
         JsonGenerator j = f.createGenerator(w);
         j.writeStartObject();
         j.writeObjectField("error", "No mod requested/Mod does not exist/Mod version does not exist");
+        j.writeEndObject();
         j.flush();
         return w.toString();
     }
 
-    @Path("/{modid}")
+    @Path("/{modid}") @GET @Produces("application/json")
     public String getModInfo(@PathParam("modid") String modid) throws Exception{
         ModContainer mod = null;
         for(ModContainer mc : loader.getModList()){
@@ -39,9 +46,27 @@ public class ModInfo {
                 mod = mc;
             }
         }
-        if(mod != null)
+        if(mod == null)
             return getNoMod();
         ModMetadata meta = mod.getMetadata();
         assert meta != null;
+        StringWriter w = new StringWriter();
+        JsonFactory f = new JsonFactory();
+        JsonGenerator j = f.createGenerator(w);
+        j.writeStartObject();
+        j.writeObjectField("name", meta.modId);
+        j.writeObjectField("pretty_name", meta.name);
+        j.writeObjectField("author", meta.authorList.stream().collect(Collectors.joining(",")));
+        j.writeObjectField("description", meta.description);
+        j.writeObjectField("link",meta.url);
+        j.writeObjectField("donate", null);
+        j.writeArrayFieldStart("versions");
+        j.writeObject(meta.version);
+        j.writeEndArray();
+        j.writeEndObject();
+        j.flush();
+        return w.toString();
     }
+
+
 }
