@@ -61,7 +61,7 @@ public class MinecraftSolder
         modpackNameProperty.comment = "The name of the modpack. Should be the same name as on technic platform";
         solderConfig.setModpackName( modpackNameProperty.getString());
 
-        Property modpackVersionProperty = config.get(CAT_TECHNIC, "modpackVersion", "1.0");
+        Property modpackVersionProperty = config.get(CAT_TECHNIC, "modpackVersion", "0.1");
         modpackNameProperty.comment = "Version of the modpack. It's the current installed version";
         solderConfig.setModpackVersion(modpackVersionProperty.getString());
 
