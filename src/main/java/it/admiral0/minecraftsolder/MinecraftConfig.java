@@ -12,6 +12,8 @@ public class MinecraftConfig {
     private String modpackName;
     private String modpackVersion;
     private String mirrorUrl;
+    private String javaArgs;
+    private String javaMem;
 
     public URI getBaseUri() {
         return baseUri;
@@ -59,5 +61,21 @@ public class MinecraftConfig {
 
     public void setMirrorUrl(String mirrorUrl) {
         this.mirrorUrl = mirrorUrl;
+    }
+
+    public String getJavaArgs() {
+        return javaArgs;
+    }
+
+    public void setJavaArgs(String javaArgs) {
+        this.javaArgs = javaArgs;
+    }
+
+    public String getJavaMem() {
+        return javaMem;
+    }
+
+    public void setJavaMem(String javaMem) {
+        this.javaMem = javaMem;
     }
 }

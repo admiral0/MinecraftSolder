@@ -59,7 +59,7 @@ public class Modpack {
         Path currentCache = solderCache.resolve(CACHE_VERSION_FILE);
         if(!Files.exists(currentCache)){
             Files.createFile(currentCache);
-            return false;
+            return true;
         }
         String v = new String(Files.readAllBytes(currentCache));
         return ! config.getModpackVersion().equals(v);
@@ -73,7 +73,6 @@ public class Modpack {
         JsonGenerator j = factory.createGenerator(fos);
         j.writeStartObject();
         j.writeObjectFieldStart("mods");
-        j.writeStartObject();
         for(ModContainer mod : Loader.instance().getModList()){
             logger.info("MOD : " + mod.getModId());
             if(loaded.contains(mod.getSource()) || skipMods.contains(mod.getModId()) || mod.getSource().isDirectory())
@@ -86,6 +85,10 @@ public class Modpack {
         j.writeObjectField(config.getModpackName()+"Config", config.getModpackVersion());
         packConfig();
         j.writeEndObject();
+        j.writeObjectField("minecraft", Loader.instance().getMinecraftModContainer().getVersion());
+        j.writeObjectField("forge", Loader.instance().getModList().stream().filter(p -> "Forge".equals(p.getModId())).findFirst().get().getVersion());
+        j.writeObjectField("java", config.getJavaArgs());
+        j.writeObjectField("memory",config.getJavaMem());
         j.writeEndObject();
         j.flush();
         j.close();
@@ -165,7 +168,7 @@ public class Modpack {
 
     public List<String> getAllVersions() throws IOException {
         final ArrayList<String> versions= new ArrayList<>();
-        Files.walk(packCache).filter(p -> p.endsWith(".json")).forEach(p -> {
+        Files.list(packCache).filter(p -> p.toString().endsWith(".json")).forEach(p -> {
             versions.add(p.getFileName().toString().replace(".json", ""));
         });
         return versions;
@@ -175,7 +178,13 @@ public class Modpack {
         return solderCache;
     }
 
+    public Path getPackCache() {
+        return packCache;
+    }
 
+    public Path getModCache() {
+        return modCache;
+    }
 
 
 }

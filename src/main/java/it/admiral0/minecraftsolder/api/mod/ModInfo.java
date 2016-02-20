@@ -6,7 +6,10 @@ import com.google.common.collect.Lists;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.ModMetadata;
+import it.admiral0.minecraftsolder.MinecraftConfig;
 import it.admiral0.minecraftsolder.MinecraftSolder;
+import it.admiral0.minecraftsolder.modpackbuilder.Modpack;
+import it.admiral0.minecraftsolder.modpackbuilder.Utils;
 import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
@@ -24,6 +27,8 @@ import java.util.stream.Collectors;
 @Path("/mod")
 public class ModInfo {
     @Inject private Loader loader;
+    @Inject private Modpack pack;
+    @Inject private MinecraftConfig config;
     private Logger logger = MinecraftSolder.logger;
 
     @GET @Produces("application/json")
@@ -38,7 +43,7 @@ public class ModInfo {
         return w.toString();
     }
 
-    @Path("/{modid}") @GET @Produces("application/json")
+    @Path("{modid}") @GET @Produces("application/json")
     public String getModInfo(@PathParam("modid") String modid) throws Exception{
         ModContainer mod = null;
         for(ModContainer mc : loader.getModList()){
@@ -63,6 +68,29 @@ public class ModInfo {
         j.writeArrayFieldStart("versions");
         j.writeObject(meta.version);
         j.writeEndArray();
+        j.writeEndObject();
+        j.flush();
+        return w.toString();
+    }
+
+    @Path("{modid}/{version}") @GET @Produces("application/json")
+    public String getModInfo(@PathParam("modid") String modid, @PathParam("version") String version) throws Exception{
+        ModContainer mod = null;
+        for(ModContainer mc : loader.getModList()){
+            if(mc.getMetadata().modId.equals(modid)){
+                mod = mc;
+            }
+        }
+        if(mod == null)
+            return getNoMod();
+        ModMetadata meta = mod.getMetadata();
+        assert meta != null;
+        StringWriter w = new StringWriter();
+        JsonFactory f = new JsonFactory();
+        JsonGenerator j = f.createGenerator(w);
+        j.writeStartObject();
+        j.writeObjectField("md5", Utils.md5(pack.getModCache().resolve(modid+"_"+ version+".zip").toFile()));
+        j.writeObjectField("url", config.getMirrorUrl() + "/mods/" + modid + "_" + version + ".zip");
         j.writeEndObject();
         j.flush();
         return w.toString();

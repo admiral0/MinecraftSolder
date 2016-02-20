@@ -28,6 +28,7 @@ public class MinecraftSolder
 
     private static final String CAT_WEBSERVER = "WebServer";
     private static final String CAT_TECHNIC = "Technic";
+    private static final String CAT_LAUNCHER = "Launcher";
 
     public static Logger logger;
 
@@ -67,6 +68,14 @@ public class MinecraftSolder
         Property mirrorUrlProperty = config.get(CAT_WEBSERVER, "mirrorUrl", "http://localhost:8000/download/");
         mirrorUrlProperty.comment = "The external URL to expose downloads";
         solderConfig.setMirrorUrl(mirrorUrlProperty.getString());
+
+        Property javaArgs = config.get(CAT_LAUNCHER, "javaArgs", "");
+        javaArgs.comment = "Java ARGS for the client";
+        solderConfig.setJavaArgs(javaArgs.getString());
+
+        Property javaMem = config.get(CAT_LAUNCHER, "javaMem", "1G");
+        javaMem.comment  = "Java default Memory for the client";
+        solderConfig.setJavaMem(javaMem.getString());
 
         config.save();
     }
