@@ -103,7 +103,7 @@ public class ModpackInfo {
             j.writeStartObject();
             j.writeObjectField("name", mod);
             j.writeObjectField("version", mods.get(mod));
-            j.writeObjectField("url", config.getMirrorUrl() + "/mods/" + mod + "_" + version + ".zip");
+            j.writeObjectField("url", config.getMirrorUrl() + "/mods/" + mod + "_" + mods.get(mod) + ".zip");
             j.writeObjectField("md5", Utils.md5(pack.getModCache().resolve(mod+ "_" + mods.get(mod) + ".zip").toFile()));
             j.writeEndObject();
         }

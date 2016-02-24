@@ -10,7 +10,9 @@ import it.admiral0.minecraftsolder.modpackbuilder.Modpack;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import org.apache.logging.log4j.Logger;
+import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.StaticHttpHandler;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.jackson.JacksonFeature;
@@ -98,6 +100,9 @@ public class MinecraftSolder
                         }
                     });
             HttpServer server = GrizzlyHttpServerFactory.createHttpServer(solderConfig.getBaseUri(), config);
+            server.getServerConfiguration().addHttpHandler(
+                    new StaticHttpHandler(modpack.getSolderCache().toAbsolutePath().toString()), "/download"
+            );
             server.start();
             logger.info("Server running on " + solderConfig.getBaseUri().toString());
         }else{

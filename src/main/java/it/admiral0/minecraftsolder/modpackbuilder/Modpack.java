@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
 /**
@@ -27,11 +28,13 @@ public class Modpack {
     private static final String CACHE_DIR = "soldercache";
     private static final String CACHE_MOD_DIR = "mods";
     private static final String CACHE_PACK_DIR = "modpack";
+    private static final String CACHE_CLIENT_DIR = "clientmods";
     private static final String CACHE_VERSION_FILE = "cached_version.txt";
 
     private final Path solderCache;
     private final Path modCache;
     private final Path packCache;
+    private final Path clientModsCache;
 
     private final Logger logger;
 
@@ -53,6 +56,10 @@ public class Modpack {
         packCache = solderCache.resolve(CACHE_PACK_DIR);
         if(!Files.exists(packCache))
             Files.createDirectories(packCache);
+
+        clientModsCache = solderCache.resolve(CACHE_CLIENT_DIR);
+        if(!Files.exists(clientModsCache))
+            Files.createDirectories(clientModsCache);
     }
 
     public boolean needsBuild() throws Exception{
@@ -77,13 +84,22 @@ public class Modpack {
             logger.info("MOD : " + mod.getModId());
             if(loaded.contains(mod.getSource()) || skipMods.contains(mod.getModId()) || mod.getSource().isDirectory())
                 continue;
+            if(!mod.getSource().exists()) {
+                logger.error("File " + mod.getSource().getAbsolutePath() + " from mod '" + mod.getModId() + "' doesn't exist. \n" +
+                        "*** Please open an issue for this error ***");
+                continue;
+            }
 
             packMod(mod);
             j.writeObjectField(mod.getModId(), mod.getVersion());
             loaded.add(mod.getSource());
         }
-        j.writeObjectField(config.getModpackName()+"Config", config.getModpackVersion());
         packConfig();
+        j.writeObjectField(config.getModpackName()+"Config", config.getModpackVersion());
+        packOrphans(loaded);
+        j.writeObjectField(config.getModpackName()+"Orphans", config.getModpackVersion());
+        packClientMods();
+        j.writeObjectField(config.getModpackName()+"Clientmods", config.getModpackVersion());
         j.writeEndObject();
         j.writeObjectField("minecraft", Loader.instance().getMinecraftModContainer().getVersion());
         j.writeObjectField("forge", Loader.instance().getModList().stream().filter(p -> "Forge".equals(p.getModId())).findFirst().get().getVersion());
@@ -137,8 +153,12 @@ public class Modpack {
         Files.walk(solderCache.resolveSibling("config")).filter(Files::isRegularFile).forEach(p -> {
             try {
                 zos.putNextEntry(new ZipEntry("config/" + p.toFile().getName()));
-                Files.copy(p,zos);
+                Files.copy(p, zos);
                 zos.closeEntry();
+            } catch (ZipException e){
+                if (e.getMessage().contains("duplicate")){
+                    logger.info("Config: Duplicate entry -> " + p.toAbsolutePath().toString());
+                }
             } catch (IOException e) {
                 logger.error("Cannot zip " + p.toString(), e);
             }
@@ -154,6 +174,84 @@ public class Modpack {
         j.writeObjectField("author", "MinecraftSolder");
         j.writeObjectField("description", "Modpack config for " + config.getModpackName());
         j.writeObjectField("link", "http://"); //TODO proper site
+        j.writeObjectField("donate", "http://");
+        j.writeObjectField("md5", Utils.md5(new File(modPath + ".zip")));
+        j.writeEndObject();
+        j.flush();
+        j.close();
+        json.close();
+    }
+
+    public void packOrphans(List<File> loaded) throws Exception{
+        String modPath = modCache.toAbsolutePath().toString() + File.separator + config.getModpackName() + "Orphans_" + config.getModpackVersion();
+        FileOutputStream fos = new FileOutputStream(modPath + ".zip");
+        ZipOutputStream zos = new ZipOutputStream(fos);
+        Files.list(solderCache.resolveSibling("mods")).filter(Files::isRegularFile).filter(
+                p -> !loaded.contains(p.toFile())
+        ).forEach(
+                p -> {
+                    try {
+                        zos.putNextEntry(new ZipEntry("mods/" + p.toFile().getName()));
+                        Files.copy(p, zos);
+                        zos.closeEntry();
+                    } catch (ZipException e){
+                        if (e.getMessage().contains("duplicate")){
+                            logger.warn("Orphan: Duplicate entry -> " + p.toAbsolutePath().toString());
+                        }
+                    } catch (IOException e) {
+                        logger.error("Cannot zip " + p.toString(), e);
+                    }
+                }
+        );
+        zos.close();
+        fos.close();
+        FileOutputStream json = new FileOutputStream(modPath + ".json");
+        JsonFactory factory = new JsonFactory();
+        JsonGenerator j = factory.createGenerator(json);
+        j.writeStartObject();
+        j.writeObjectField("modid", config.getModpackName() + "Orphans");
+        j.writeObjectField("pretty_name", config.getModpackName() + " Orphans");
+        j.writeObjectField("author", "MinecraftSolder");
+        j.writeObjectField("description", "Modpack orphans for " + config.getModpackName() + ". Mods that have no metadata.");
+        j.writeObjectField("link", "http://");
+        j.writeObjectField("donate", "http://");
+        j.writeObjectField("md5", Utils.md5(new File(modPath + ".zip")));
+        j.writeEndObject();
+        j.flush();
+        j.close();
+        json.close();
+    }
+
+    public void packClientMods() throws Exception{
+        String modPath = modCache.toAbsolutePath().toString() + File.separator + config.getModpackName() + "Clientmods_" + config.getModpackVersion();
+        FileOutputStream fos = new FileOutputStream(modPath + ".zip");
+        ZipOutputStream zos = new ZipOutputStream(fos);
+        Files.list(clientModsCache).filter(Files::isRegularFile).forEach(
+                p -> {
+                    try {
+                        zos.putNextEntry(new ZipEntry("mods/" + p.toFile().getName()));
+                        Files.copy(p, zos);
+                        zos.closeEntry();
+                    } catch (ZipException e){
+                        if (e.getMessage().contains("duplicate")){
+                            logger.warn("ClientMod: Duplicate entry -> " + p.toAbsolutePath().toString());
+                        }
+                    } catch (IOException e) {
+                        logger.error("Cannot zip " + p.toString(), e);
+                    }
+                }
+        );
+        zos.close();
+        fos.close();
+        FileOutputStream json = new FileOutputStream(modPath + ".json");
+        JsonFactory factory = new JsonFactory();
+        JsonGenerator j = factory.createGenerator(json);
+        j.writeStartObject();
+        j.writeObjectField("modid", config.getModpackName() + "Clientmods");
+        j.writeObjectField("pretty_name", config.getModpackName() + " Client Mods");
+        j.writeObjectField("author", "MinecraftSolder");
+        j.writeObjectField("description", "Modpack Client Mods for " + config.getModpackName() + ". Mods that run only on the client.");
+        j.writeObjectField("link", "http://");
         j.writeObjectField("donate", "http://");
         j.writeObjectField("md5", Utils.md5(new File(modPath + ".zip")));
         j.writeEndObject();
@@ -185,6 +283,5 @@ public class Modpack {
     public Path getModCache() {
         return modCache;
     }
-
 
 }
