@@ -1,0 +1,11 @@
+--2016-02-24 18:52:37--  http://www.gnu.org/licenses/gpl-3.0.txt
+Risoluzione di www.gnu.org (www.gnu.org)... 2001:4830:134:3::a, 208.118.235.148
+Connessione a www.gnu.org (www.gnu.org)|2001:4830:134:3::a|:80... connesso.
+Richiesta HTTP inviata, in attesa di risposta... 200 OK
+Lunghezza: 35147 (34K) [text/plain]
+Salvataggio in: "gpl-3.0.txt"
+
+     0K .......... .......... .......... ....                 100% 79,6K=0,4s
+
+2016-02-24 18:52:38 (79,6 KB/s) - "gpl-3.0.txt" salvato [35147/35147]
+
