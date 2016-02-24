@@ -6,7 +6,7 @@ This is a mod implementing the TechnicSolder api in minecraft itself. It uses an
 
  * Download the latest version of the mod and put it in your mods/ dir
  * Launch server and stop it after it finished
- * Delete soldercache/*.txt , soldercache/mods/* and soldercache/modpack/*.json
+ * Delete soldercache/\*.txt , soldercache/mods/\* and soldercache/modpack/\*.json
  * Edit config/minecraftsolder.cfg
 
 You're done.
