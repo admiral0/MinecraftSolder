@@ -64,7 +64,7 @@ public class MinecraftSolder
         solderConfig.setModpackName( modpackNameProperty.getString());
 
         Property modpackVersionProperty = config.get(CAT_TECHNIC, "modpackVersion", "0.1");
-        modpackNameProperty.comment = "Version of the modpack. It's the current installed version";
+        modpackVersionProperty.comment = "Version of the modpack. It's the current installed version";
         solderConfig.setModpackVersion(modpackVersionProperty.getString());
 
         Property mirrorUrlProperty = config.get(CAT_WEBSERVER, "mirrorUrl", "http://localhost:8000/download/");
