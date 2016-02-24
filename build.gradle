@@ -12,12 +12,12 @@ buildscript {
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
-    }
+        }
 }
 
 apply plugin: 'forge'
 
-version = "0.1"
+version = "0.1.1"
 group= "it.admiral0.minecraftsolder" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "minecraftsolder"
 
@@ -29,6 +29,15 @@ minecraft {
     runDir = "eclipse"
 }
 
+configurations {
+    embedded
+}
+
+void embed(config){
+    dependencies.compile config
+    dependencies.embedded config
+}
+
 dependencies {
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
@@ -36,8 +45,8 @@ dependencies {
     //compile "some.group:artifact:version"
 
 
-    compile 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:2.22.1'
-    compile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.22.1'
+    embed 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:2.22.1'
+    embed 'org.glassfish.jersey.media:jersey-media-json-jackson:2.22.1'
 
 
     // real examples
@@ -69,3 +78,14 @@ processResources
         exclude 'mcmod.info'
     }
 }
+
+afterEvaluate {
+    jar {
+        from configurations.embedded.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+        classifier = 'mc' + project.minecraft.version
+    }
+}
+
+
