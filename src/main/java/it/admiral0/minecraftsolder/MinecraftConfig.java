@@ -14,6 +14,7 @@ public class MinecraftConfig {
     private String mirrorUrl;
     private String javaArgs;
     private String javaMem;
+    private boolean enabled;
 
     public URI getBaseUri() {
         return baseUri;
@@ -77,5 +78,13 @@ public class MinecraftConfig {
 
     public void setJavaMem(String javaMem) {
         this.javaMem = javaMem;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

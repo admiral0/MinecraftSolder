@@ -31,6 +31,7 @@ public class MinecraftSolder
     private static final String CAT_WEBSERVER = "WebServer";
     private static final String CAT_TECHNIC = "Technic";
     private static final String CAT_LAUNCHER = "Launcher";
+    private static final String CAT_GENERAL = "General";
 
     public static Logger logger;
 
@@ -46,6 +47,10 @@ public class MinecraftSolder
 
         Configuration config = new Configuration(event.getSuggestedConfigurationFile());
         config.load();
+
+        Property enabledProp = config.get(CAT_GENERAL, "enabled", false);
+        enabledProp.comment = "The mod is disabled by default. Change this to true to generate cache the next startup";
+        solderConfig.setEnabled(enabledProp.getBoolean());
 
         Property portProperty = config.get(CAT_WEBSERVER, "port", 8000);
         portProperty.comment = "The port the webserver runs on.\n"
@@ -85,7 +90,7 @@ public class MinecraftSolder
     @EventHandler
     public void init(FMLInitializationEvent event) throws Exception
     {
-        if(event.getSide().isServer()) {
+        if(event.getSide().isServer() && solderConfig.isEnabled()) {
             modpack = new Modpack(logger, solderConfig);
             logger.info("Loading mod MinecraftSolder");
             ResourceConfig config = new ResourceConfig()
@@ -106,13 +111,13 @@ public class MinecraftSolder
             server.start();
             logger.info("Server running on " + solderConfig.getBaseUri().toString());
         }else{
-            logger.info("Will not load if not on the client.");
+            logger.info("Mod is disabled.");
         }
     }
 
     @EventHandler
     public void postinit(FMLPostInitializationEvent event) throws Exception {
-        if(event.getSide().isServer()){
+        if(event.getSide().isServer() && solderConfig.isEnabled()){
             if(modpack.needsBuild()){
                 modpack.build();
             }
