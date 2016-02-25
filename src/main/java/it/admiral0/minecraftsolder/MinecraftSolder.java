@@ -90,8 +90,10 @@ public class MinecraftSolder
     @EventHandler
     public void init(FMLInitializationEvent event) throws Exception
     {
-        if(event.getSide().isServer() && solderConfig.isEnabled()) {
+        if(event.getSide().isServer())
             modpack = new Modpack(logger, solderConfig);
+        if(event.getSide().isServer() && solderConfig.isEnabled()) {
+
             logger.info("Loading mod MinecraftSolder");
             ResourceConfig config = new ResourceConfig()
                     .packages("it.admiral0")
