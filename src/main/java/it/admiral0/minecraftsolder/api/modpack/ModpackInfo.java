@@ -3,10 +3,12 @@ package it.admiral0.minecraftsolder.api.modpack;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import cpw.mods.fml.common.Loader;
 import it.admiral0.minecraftsolder.MinecraftConfig;
 import it.admiral0.minecraftsolder.modpackbuilder.Modpack;
 import it.admiral0.minecraftsolder.modpackbuilder.Utils;
+import scala.actors.threadpool.Arrays;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -15,6 +17,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -122,11 +126,20 @@ public class ModpackInfo {
 
 
     private void populateIcons(JsonGenerator j) throws Exception{
-        j.writeObjectField("icon", null);
-        j.writeObjectField("icon_md5", null);
-        j.writeObjectField("logo", null);
-        j.writeObjectField("logo_md5", null);
-        j.writeObjectField("background", null);
-        j.writeObjectField("background_md5", null);
+        final java.nio.file.Path p = pack.getSolderCache();
+        List<String> imgs = Lists.newArrayList("icon", "logo", "background");
+        imgs.stream().forEach( img -> {
+            try {
+                if(Files.exists(p.resolve(img + ".png"))){
+                    j.writeObjectField(img, "/" + img + ".png");
+                    j.writeObjectField(img + "_md5",Utils.md5(p.resolve(img + ".png").toFile()));
+                }else{
+                    j.writeObjectField(img, null);
+                    j.writeObjectField(img + "_md5", null);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 }

@@ -49,6 +49,12 @@ public class Modpack {
         if(!Files.exists(solderCache)){
             Files.createDirectories(solderCache);
         }
+        Path readme = solderCache.resolve("README.txt");
+        if(!Files.exists(readme)){
+            Files.copy(Modpack.class.getResourceAsStream("/README.txt"), readme);
+        }
+
+
         modCache = solderCache.resolve(CACHE_MOD_DIR);
         if(!Files.exists(modCache))
             Files.createDirectories(modCache);
