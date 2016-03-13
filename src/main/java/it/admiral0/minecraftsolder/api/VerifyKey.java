@@ -20,7 +20,7 @@ import javax.ws.rs.Produces;
  *
  * @author danielguarise
  */
-@Path("/verify/")
+@Path("/api/verify/")
 public class VerifyKey {
     
     @Inject

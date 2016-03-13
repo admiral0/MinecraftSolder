@@ -1,4 +1,4 @@
-package it.admiral0.minecraftsolder.api.mod;
+package it.admiral0.minecraftsolder.http;
 
 import cpw.mods.fml.common.Loader;
 
@@ -10,7 +10,7 @@ import javax.ws.rs.Produces;
 /**
  * Created by admiral0 on 25/02/16.
  */
-@Path("mods.html")
+@Path("/mods.html")
 public class ModHtml {
     @Inject
     private Loader loader;

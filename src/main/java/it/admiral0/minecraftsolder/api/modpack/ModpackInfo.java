@@ -20,7 +20,7 @@ import java.nio.file.Files;
 /**
  * Manages Modpack API URLS
  */
-@Path("/modpack/")
+@Path("/api/modpack/")
 public class ModpackInfo {
     @Inject
     private MinecraftConfig config;

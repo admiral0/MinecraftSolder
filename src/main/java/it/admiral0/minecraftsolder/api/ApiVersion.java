@@ -11,7 +11,7 @@ import javax.ws.rs.Produces;
 /**
  * Created by admiral0 on 29/01/16.
  */
-@Path("/")
+@Path("/api")
 public class ApiVersion {
     @Inject
     private Gson gson;

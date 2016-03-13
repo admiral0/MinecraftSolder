@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 /**
  * This class exposes the API for MOD listing
  */
-@Path("/mod")
+@Path("/api/mod")
 public class ModInfo {
     @Inject private Loader loader;
     @Inject private Modpack pack;
