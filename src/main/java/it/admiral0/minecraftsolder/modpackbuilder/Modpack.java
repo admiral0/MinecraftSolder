@@ -87,7 +87,7 @@ public class Modpack {
         val cache = ModpackCacheObject.builder();
         for(ModContainer mod : Loader.instance().getModList()){
             logger.info("MOD : " + mod.getModId());
-            if(loaded.contains(mod.getSource()) || skipMods.contains(mod.getModId()) || mod.getSource().isDirectory())
+            if(loaded.contains(mod.getSource()) || skipMods.contains(mod.getModId()) || mod.getSource().isDirectory() || "@VERSION@".equalsIgnoreCase(mod.getVersion()))
                 continue;
             if(!mod.getSource().exists()) {
                 logger.error("File " + mod.getSource().getAbsolutePath() + " from mod '" + mod.getModId() + "' doesn't exist. \n" +
@@ -96,7 +96,7 @@ public class Modpack {
             }
 
             packMod(mod);
-            cache.mod(mod.getModId(), mod.getVersion());
+            cache.mod(mod.getModId(), Utils.sanitizeVersion(mod.getVersion()));
             loaded.add(mod.getSource());
         }
         packConfig();
@@ -116,7 +116,7 @@ public class Modpack {
     private void packMod(ModContainer mod) throws Exception{
         String modPath = modCache.toAbsolutePath().toString()
                 + File.separator
-                + mod.getModId() + "_" + mod.getVersion();
+                + mod.getModId() + "_" + Utils.sanitizeVersion(mod.getVersion());
         if(new File(modPath + ".zip").exists())
             return;
         FileOutputStream fos = new FileOutputStream(modPath + ".zip");

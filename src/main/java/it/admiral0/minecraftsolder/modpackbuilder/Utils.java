@@ -12,4 +12,8 @@ public class Utils {
     public static String md5(File file) throws Exception {
         return Files.hash(file, Hashing.md5()).toString();
     }
+
+    public static String sanitizeVersion(String inVer) {
+        return inVer.replaceAll(" ","");
+    }
 }
