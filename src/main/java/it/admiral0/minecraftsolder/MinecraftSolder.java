@@ -1,5 +1,8 @@
 package it.admiral0.minecraftsolder;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -10,15 +13,12 @@ import it.admiral0.minecraftsolder.modpackbuilder.Modpack;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import org.apache.logging.log4j.Logger;
-import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.StaticHttpHandler;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
@@ -36,6 +36,12 @@ public class MinecraftSolder
     public static Logger logger;
 
     private Modpack modpack;
+
+    private Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .serializeNulls()
+            .create();
 
     private MinecraftConfig solderConfig = new MinecraftConfig();
 
@@ -91,19 +97,20 @@ public class MinecraftSolder
     public void init(FMLInitializationEvent event) throws Exception
     {
         if(event.getSide().isServer())
-            modpack = new Modpack(logger, solderConfig);
+            modpack = new Modpack(logger, solderConfig, gson);
         if(event.getSide().isServer() && solderConfig.isEnabled()) {
 
             logger.info("Loading mod MinecraftSolder");
             ResourceConfig config = new ResourceConfig()
                     .packages("it.admiral0")
-                    .register(JacksonFeature.class)
                     .register(new AbstractBinder() {
                         @Override
                         protected void configure() {
                             bind(solderConfig);
                             bind(Loader.instance());
                             bind(modpack);
+                            bind(logger);
+                            bind(gson);
                         }
                     });
             HttpServer server = GrizzlyHttpServerFactory.createHttpServer(solderConfig.getBaseUri(), config);

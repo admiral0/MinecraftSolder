@@ -5,10 +5,11 @@
  */
 package it.admiral0.minecraftsolder.api;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
+import com.google.gson.Gson;
 import it.admiral0.minecraftsolder.MinecraftConfig;
-import java.io.StringWriter;
+import it.admiral0.minecraftsolder.pojo.InvalidKeyObject;
+import it.admiral0.minecraftsolder.pojo.ValidKeyObject;
+
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -24,32 +25,21 @@ public class VerifyKey {
     
     @Inject
     private MinecraftConfig config;
-    
+
+    @Inject
+    private Gson gson;
+
     @GET @Path("{apikey}") @Produces("application/json")
     public String verify(@PathParam("apikey") String apiKey) throws Exception{
-        String jsonKey = "error";
-        String msg = "No API key provided.";
-        
         if (apiKey!=null && apiKey.length()!=0) {
-            
             if (config.getApiKey().equalsIgnoreCase(apiKey)) {
-                jsonKey = "valid";
-                msg = "Key validated.";
+                return gson.toJson(ValidKeyObject.builder().valid("Key validated.").build());
             } else {
-                msg = "Invalid key provided.";
+                return gson.toJson(InvalidKeyObject.builder().error("Invalid key provided.").build());
             }
-            
         }
-        
-        StringWriter w = new StringWriter();
-        JsonFactory f = new JsonFactory();
-        JsonGenerator j = f.createGenerator(w);
-        j.writeStartObject();
-        j.writeObjectField(jsonKey, msg);
-        j.writeEndObject();
-        j.flush();
-        return w.toString();
-    }
+        return gson.toJson(InvalidKeyObject.builder().error("No API key provided.").build());
+       }
     
     @GET @Produces("application/json")
     public String verify() throws Exception{

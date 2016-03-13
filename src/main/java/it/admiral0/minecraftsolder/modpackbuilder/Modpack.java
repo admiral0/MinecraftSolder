@@ -1,10 +1,11 @@
 package it.admiral0.minecraftsolder.modpackbuilder;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
+import com.google.gson.Gson;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import it.admiral0.minecraftsolder.MinecraftConfig;
+import it.admiral0.minecraftsolder.pojo.pack.ModpackCacheObject;
+import lombok.val;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -16,7 +17,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
@@ -38,13 +38,16 @@ public class Modpack {
 
     private final Logger logger;
 
+    private final Gson gson;
+
     private final MinecraftConfig config;
 
     private final List<String> skipMods = Arrays.asList("mcp","FML");
 
-    public Modpack(Logger logger, MinecraftConfig config) throws Exception {
+    public Modpack(Logger logger, MinecraftConfig config, Gson gson) throws Exception {
         this.config = config;
         this.logger = logger;
+        this.gson = gson;
         solderCache = Paths.get(Loader.instance().getConfigDir().getParent(), CACHE_DIR);
         if(!Files.exists(solderCache)){
             Files.createDirectories(solderCache);
@@ -81,11 +84,7 @@ public class Modpack {
 
     public void build() throws Exception {
         ArrayList<File> loaded = new ArrayList<>();
-        FileOutputStream fos = new FileOutputStream(packCache.toAbsolutePath().toString() + File.separator + config.getModpackVersion() + ".json");
-        JsonFactory factory = new JsonFactory();
-        JsonGenerator j = factory.createGenerator(fos);
-        j.writeStartObject();
-        j.writeObjectFieldStart("mods");
+        val cache = ModpackCacheObject.builder();
         for(ModContainer mod : Loader.instance().getModList()){
             logger.info("MOD : " + mod.getModId());
             if(loaded.contains(mod.getSource()) || skipMods.contains(mod.getModId()) || mod.getSource().isDirectory())
@@ -97,24 +96,20 @@ public class Modpack {
             }
 
             packMod(mod);
-            j.writeObjectField(mod.getModId(), mod.getVersion());
+            cache.mod(mod.getModId(), mod.getVersion());
             loaded.add(mod.getSource());
         }
         packConfig();
-        j.writeObjectField(config.getModpackName()+"Config", config.getModpackVersion());
+        cache.mod(config.getModpackName()+"Config", config.getModpackVersion());
         packOrphans(loaded);
-        j.writeObjectField(config.getModpackName()+"Orphans", config.getModpackVersion());
+        cache.mod(config.getModpackName()+"Orphans", config.getModpackVersion());
         packClientMods();
-        j.writeObjectField(config.getModpackName()+"Clientmods", config.getModpackVersion());
-        j.writeEndObject();
-        j.writeObjectField("minecraft", Loader.instance().getMinecraftModContainer().getVersion());
-        j.writeObjectField("forge", Loader.instance().getModList().stream().filter(p -> "Forge".equals(p.getModId())).findFirst().get().getVersion());
-        j.writeObjectField("java", config.getJavaArgs());
-        j.writeObjectField("memory",config.getJavaMem());
-        j.writeEndObject();
-        j.flush();
-        j.close();
-        fos.close();
+        cache.mod(config.getModpackName()+"Clientmods", config.getModpackVersion());
+        cache.minecraft(Loader.instance().getMinecraftModContainer().getVersion());
+        cache.forge(Loader.instance().getModList().stream().filter(p -> "Forge".equals(p.getModId())).findFirst().get().getVersion());
+        cache.javaArgs(config.getJavaArgs());
+        cache.memory(config.getJavaMem());
+        Files.write(packCache.resolve(config.getModpackVersion() + ".json"), gson.toJson(cache.build()).getBytes());
         Files.write(solderCache.resolve(CACHE_VERSION_FILE), config.getModpackVersion().getBytes());
     }
 
@@ -135,21 +130,6 @@ public class Modpack {
         zos.closeEntry();
         zos.close();
         fos.close();
-        FileOutputStream json = new FileOutputStream(modPath + ".json");
-        JsonFactory factory = new JsonFactory();
-        JsonGenerator j = factory.createGenerator(json);
-        j.writeStartObject();
-        j.writeObjectField("modid", mod.getModId());
-        j.writeObjectField("pretty_name", mod.getName());
-        j.writeObjectField("author", mod.getMetadata().authorList.stream().collect(Collectors.joining(",")));
-        j.writeObjectField("description", mod.getMetadata().description);
-        j.writeObjectField("link", mod.getMetadata().url);
-        j.writeObjectField("donate", null);
-        j.writeObjectField("md5", Utils.md5(new File(modPath + ".zip")));
-        j.writeEndObject();
-        j.flush();
-        j.close();
-        json.close();
     }
 
     private void packConfig() throws Exception{
@@ -171,21 +151,6 @@ public class Modpack {
         });
         zos.close();
         fos.close();
-        FileOutputStream json = new FileOutputStream(modPath + ".json");
-        JsonFactory factory = new JsonFactory();
-        JsonGenerator j = factory.createGenerator(json);
-        j.writeStartObject();
-        j.writeObjectField("modid", config.getModpackName() + "Config");
-        j.writeObjectField("pretty_name", config.getModpackName() + " Config");
-        j.writeObjectField("author", "MinecraftSolder");
-        j.writeObjectField("description", "Modpack config for " + config.getModpackName());
-        j.writeObjectField("link", "http://"); //TODO proper site
-        j.writeObjectField("donate", "http://");
-        j.writeObjectField("md5", Utils.md5(new File(modPath + ".zip")));
-        j.writeEndObject();
-        j.flush();
-        j.close();
-        json.close();
     }
 
     public void packOrphans(List<File> loaded) throws Exception{
@@ -211,21 +176,6 @@ public class Modpack {
         );
         zos.close();
         fos.close();
-        FileOutputStream json = new FileOutputStream(modPath + ".json");
-        JsonFactory factory = new JsonFactory();
-        JsonGenerator j = factory.createGenerator(json);
-        j.writeStartObject();
-        j.writeObjectField("modid", config.getModpackName() + "Orphans");
-        j.writeObjectField("pretty_name", config.getModpackName() + " Orphans");
-        j.writeObjectField("author", "MinecraftSolder");
-        j.writeObjectField("description", "Modpack orphans for " + config.getModpackName() + ". Mods that have no metadata.");
-        j.writeObjectField("link", "http://");
-        j.writeObjectField("donate", "http://");
-        j.writeObjectField("md5", Utils.md5(new File(modPath + ".zip")));
-        j.writeEndObject();
-        j.flush();
-        j.close();
-        json.close();
     }
 
     public void packClientMods() throws Exception{
@@ -249,21 +199,6 @@ public class Modpack {
         );
         zos.close();
         fos.close();
-        FileOutputStream json = new FileOutputStream(modPath + ".json");
-        JsonFactory factory = new JsonFactory();
-        JsonGenerator j = factory.createGenerator(json);
-        j.writeStartObject();
-        j.writeObjectField("modid", config.getModpackName() + "Clientmods");
-        j.writeObjectField("pretty_name", config.getModpackName() + " Client Mods");
-        j.writeObjectField("author", "MinecraftSolder");
-        j.writeObjectField("description", "Modpack Client Mods for " + config.getModpackName() + ". Mods that run only on the client.");
-        j.writeObjectField("link", "http://");
-        j.writeObjectField("donate", "http://");
-        j.writeObjectField("md5", Utils.md5(new File(modPath + ".zip")));
-        j.writeEndObject();
-        j.flush();
-        j.close();
-        json.close();
     }
 
     public String getInstalledModpack() throws IOException {
@@ -272,8 +207,8 @@ public class Modpack {
 
     public List<String> getAllVersions() throws IOException {
         final ArrayList<String> versions= new ArrayList<>();
-        Files.list(packCache).filter(p -> p.toString().endsWith(".json")).forEach(p -> {
-            versions.add(p.getFileName().toString().replace(".json", ""));
+        Files.list(packCache).filter(p -> p.toString().endsWith(".zip")).forEach(p -> {
+            versions.add(p.getFileName().toString().replace(".zip", ""));
         });
         return versions;
     }

@@ -17,7 +17,7 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "0.3"
+version = "0.4"
 group= "it.admiral0.minecraftsolder" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "minecraftsolder"
 
@@ -46,7 +46,7 @@ dependencies {
 
 
     embed 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:2.22.1'
-    embed 'org.glassfish.jersey.media:jersey-media-json-jackson:2.22.1'
+    compile 'org.projectlombok:lombok:1.16.6'
 
 
     // real examples
