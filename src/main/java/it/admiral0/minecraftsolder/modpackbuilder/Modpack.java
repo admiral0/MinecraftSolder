@@ -207,8 +207,8 @@ public class Modpack {
 
     public List<String> getAllVersions() throws IOException {
         final ArrayList<String> versions= new ArrayList<>();
-        Files.list(packCache).filter(p -> p.toString().endsWith(".zip")).forEach(p -> {
-            versions.add(p.getFileName().toString().replace(".zip", ""));
+        Files.list(packCache).filter(p -> p.toString().endsWith(".json")).forEach(p -> {
+            versions.add(p.getFileName().toString().replace(".json", ""));
         });
         return versions;
     }

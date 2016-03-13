@@ -109,7 +109,6 @@ public class MinecraftSolder
                             bind(solderConfig);
                             bind(Loader.instance());
                             bind(modpack);
-                            bind(logger);
                             bind(gson);
                         }
                     });

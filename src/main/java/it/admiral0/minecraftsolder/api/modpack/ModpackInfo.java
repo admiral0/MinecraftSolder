@@ -1,10 +1,12 @@
 package it.admiral0.minecraftsolder.api.modpack;
 
 import com.google.gson.Gson;
+import cpw.mods.fml.common.FMLLog;
 import it.admiral0.minecraftsolder.MinecraftConfig;
 import it.admiral0.minecraftsolder.modpackbuilder.Modpack;
 import it.admiral0.minecraftsolder.modpackbuilder.Utils;
 import it.admiral0.minecraftsolder.pojo.pack.*;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
@@ -26,8 +28,7 @@ public class ModpackInfo {
     private Modpack pack;
     @Inject
     private Gson gson;
-    @Inject
-    private Logger log;
+    private Logger log = FMLLog.getLogger();
 
     private static final String ICON_FILE = "icon.png";
     private static final String LOGO_FILE = "logo.png";
