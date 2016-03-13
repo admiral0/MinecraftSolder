@@ -6,14 +6,10 @@ import it.admiral0.minecraftsolder.MinecraftConfig;
 import it.admiral0.minecraftsolder.modpackbuilder.Modpack;
 import it.admiral0.minecraftsolder.modpackbuilder.Utils;
 import it.admiral0.minecraftsolder.pojo.pack.*;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import java.io.FileReader;
 import java.nio.file.Files;
 
@@ -35,13 +31,37 @@ public class ModpackInfo {
     private static final String BG_FILE = "background.png";
 
     @GET @Produces("application/json")
-    public String getNoSlug() throws Exception{
+    public String getNoSlug(@DefaultValue("none") @QueryParam("include") String v) throws Exception{
+        if("full".equalsIgnoreCase(v))
+            return gson.toJson(
+                ModpackListFullObject.builder()
+                        .modpack(config.getModpackName(), createPackInfo())
+                        .mirrorUrl(config.getMirrorUrl())
+                        .build()
+            );
         return gson.toJson(
                 ModpackListObject.builder()
-                        .modpack(config.getModpackName(),config.getModpackName())
+                        .modpack(config.getModpackName(), config.getModpackName())
                         .mirrorUrl(config.getMirrorUrl())
-                .build()
+                        .build()
         );
+    }
+
+    private ModpackInfoSingleObject createPackInfo() throws Exception{
+        final java.nio.file.Path p = pack.getSolderCache();
+        return ModpackInfoSingleObject.builder()
+                .icon((Files.exists(p.resolve("icon.png"))) ? "/icon.png" : null)
+                .icon_md5((Files.exists(p.resolve("icon.png"))) ? Utils.md5(p.resolve("icon.png").toFile()) : null)
+                .logo((Files.exists(p.resolve("logo.png"))) ? "/logo.png" : null)
+                .logo_md5((Files.exists(p.resolve("logo.png"))) ? Utils.md5(p.resolve("logo.png").toFile()) : null)
+                .background((Files.exists(p.resolve("background.png"))) ? "/background.png" : null)
+                .background_md5((Files.exists(p.resolve("background.png"))) ? Utils.md5(p.resolve("background.png").toFile()) : null)
+                .displayName(config.getModpackName())
+                .name(config.getModpackName())
+                .buildVersions(pack.getAllVersions())
+                .recommended(config.getModpackVersion())
+                .latest(config.getModpackVersion())
+                .build();
     }
 
     @GET @Path("{modpack}")  @Produces("application/json")
