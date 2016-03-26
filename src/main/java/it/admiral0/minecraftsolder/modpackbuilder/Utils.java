@@ -18,7 +18,7 @@ public class Utils {
     }
 
     private static String sanitizeName(String inName) {
-        return inName.replaceAll("|", "");
+        return inName.replaceAll("\\|", "");
     }
 
     public static String getFilename(String name, String version) {

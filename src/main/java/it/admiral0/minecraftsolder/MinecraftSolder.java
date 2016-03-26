@@ -26,7 +26,7 @@ import java.net.URI;
 public class MinecraftSolder
 {
     public static final String MODID = "minecraftsolder";
-    public static final String VERSION = "0.4.6";
+    public static final String VERSION = "0.4.7";
 
     private static final String CAT_WEBSERVER = "WebServer";
     private static final String CAT_TECHNIC = "Technic";
