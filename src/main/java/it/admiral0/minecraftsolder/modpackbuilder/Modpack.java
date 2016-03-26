@@ -96,7 +96,7 @@ public class Modpack {
             }
 
             packMod(mod);
-            cache.mod(mod.getModId(), mod.getVersion());
+            cache.mod(Utils.sanitizeName(mod.getModId()), mod.getVersion());
             loaded.add(mod.getSource());
         }
         packConfig();

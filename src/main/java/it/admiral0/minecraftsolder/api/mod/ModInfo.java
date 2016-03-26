@@ -45,7 +45,7 @@ public class ModInfo {
     public String getModInfo(@PathParam("modid") String modid) throws Exception{
         ModContainer mod = null;
         for(ModContainer mc : loader.getModList()){
-            if(mc.getMetadata().modId.equals(modid)){
+            if(Utils.sanitizeName(mc.getMetadata().modId).equals(modid)){
                 mod = mc;
             }
         }

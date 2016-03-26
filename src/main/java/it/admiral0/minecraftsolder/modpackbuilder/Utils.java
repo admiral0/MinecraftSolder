@@ -13,11 +13,11 @@ public class Utils {
         return Files.hash(file, Hashing.md5()).toString();
     }
 
-    private static String sanitizeVersion(String inVer) {
+    public static String sanitizeVersion(String inVer) {
         return inVer.replaceAll(" ","");
     }
 
-    private static String sanitizeName(String inName) {
+    public static String sanitizeName(String inName) {
         return inName.replaceAll("\\|", "");
     }
 

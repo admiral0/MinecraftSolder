@@ -106,8 +106,8 @@ public class ModpackInfo {
                     try {
                         builder.mod(
                                 SingleModObject.builder()
-                                        .name(entry.getKey())
-                                        .version(entry.getValue())
+                                        .name(Utils.sanitizeName(entry.getKey()))
+                                        .version(Utils.sanitizeVersion(entry.getValue()))
                                         .url(config.getMirrorUrl() + "/mods/" + Utils.getFilename(entry.getKey(), entry.getValue()) + ".zip")
                                         .md5(Utils.md5(pack.getModCache().resolve(Utils.getFilename(entry.getKey(), entry.getValue()) + ".zip").toFile()))
                                         .build()
