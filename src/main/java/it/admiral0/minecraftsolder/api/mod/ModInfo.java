@@ -93,7 +93,7 @@ public class ModInfo {
         assert meta != null;
         return gson.toJson(
                 ModInfoVersionObject.builder()
-                        .url(config.getMirrorUrl() + "/mods/" + modid + "_" + version + ".zip")
+                        .url(config.getMirrorUrl() + "/mods/" + Utils.getFilename(modid, version) + ".zip")
                         .md5( Utils.md5(pack.getModCache().resolve(modid+"_"+ version+".zip").toFile()))
                 .build()
         );

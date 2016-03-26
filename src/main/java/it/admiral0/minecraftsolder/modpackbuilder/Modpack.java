@@ -96,7 +96,7 @@ public class Modpack {
             }
 
             packMod(mod);
-            cache.mod(mod.getModId(), Utils.sanitizeVersion(mod.getVersion()));
+            cache.mod(mod.getModId(), mod.getVersion());
             loaded.add(mod.getSource());
         }
         packConfig();
@@ -116,7 +116,7 @@ public class Modpack {
     private void packMod(ModContainer mod) throws Exception{
         String modPath = modCache.toAbsolutePath().toString()
                 + File.separator
-                + mod.getModId() + "_" + Utils.sanitizeVersion(mod.getVersion());
+                + Utils.getFilename(mod.getModId(), mod.getVersion());
         if(new File(modPath + ".zip").exists())
             return;
         FileOutputStream fos = new FileOutputStream(modPath + ".zip");

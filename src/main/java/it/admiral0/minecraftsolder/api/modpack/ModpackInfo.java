@@ -108,8 +108,8 @@ public class ModpackInfo {
                                 SingleModObject.builder()
                                         .name(entry.getKey())
                                         .version(entry.getValue())
-                                        .url(config.getMirrorUrl() + "/mods/" + entry.getKey() + "_" + entry.getValue() + ".zip")
-                                        .md5(Utils.md5(pack.getModCache().resolve(entry.getKey() + "_" + entry.getValue() + ".zip").toFile()))
+                                        .url(config.getMirrorUrl() + "/mods/" + Utils.getFilename(entry.getKey(), entry.getValue()) + ".zip")
+                                        .md5(Utils.md5(pack.getModCache().resolve(Utils.getFilename(entry.getKey(), entry.getValue()) + ".zip").toFile()))
                                         .build()
                         );
                     } catch (Exception e){

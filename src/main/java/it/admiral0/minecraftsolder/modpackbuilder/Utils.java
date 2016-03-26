@@ -13,7 +13,15 @@ public class Utils {
         return Files.hash(file, Hashing.md5()).toString();
     }
 
-    public static String sanitizeVersion(String inVer) {
+    private static String sanitizeVersion(String inVer) {
         return inVer.replaceAll(" ","");
+    }
+
+    private static String sanitizeName(String inName) {
+        return inName.replaceAll("|", "");
+    }
+
+    public static String getFilename(String name, String version) {
+        return sanitizeName(name) + "_" + sanitizeVersion(version);
     }
 }
