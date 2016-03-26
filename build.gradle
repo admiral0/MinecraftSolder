@@ -12,12 +12,12 @@ buildscript {
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
-        }
+    }
 }
 
 apply plugin: 'forge'
 
-version = "0.4.5"
+version = "0.4.6"
 group= "it.admiral0.minecraftsolder" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "minecraftsolder"
 
